@@ -36,7 +36,7 @@
 		22341D4C24C75BA600BB8725 /* CocktailTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CocktailTableViewCell.swift; sourceTree = "<group>"; };
 		2298631C24AB582800B934DC /* CocktailRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CocktailRequest.swift; sourceTree = "<group>"; };
 		2298631E24AC6C6D00B934DC /* CocktailRealm.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CocktailRealm.swift; sourceTree = "<group>"; };
-		2298640D24B4965A00B934DC /* Cocktail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Cocktail.swift; path = ../../../../Desktop/Cocktails/Cocktails/Models/Cocktail.swift; sourceTree = "<group>"; };
+		2298640D24B4965A00B934DC /* Cocktail.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cocktail.swift; sourceTree = "<group>"; };
 		2298641A24B71BD800B934DC /* MainViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		2298641C24B7338800B934DC /* CollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionViewCell.swift; sourceTree = "<group>"; };
 		22ADA30E24A631DC00D4B9C5 /* Cocktails.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Cocktails.app; sourceTree = BUILT_PRODUCTS_DIR; };
