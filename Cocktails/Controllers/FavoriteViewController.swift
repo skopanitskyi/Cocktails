@@ -14,7 +14,7 @@ class FavoriteViewController: UIViewController {
     // MARK: - Favorite view controller instances
     
     /// Stores saved cocktails
-    public var drinks: Results<CocktailRealm>?
+    public var drinks = [CocktailRealm]()
     
     /// Singleton object of class Realm Service
     private let realmService = RealmService.shared
@@ -36,6 +36,12 @@ class FavoriteViewController: UIViewController {
         navigationItem.title = "Favorite"
         navigationController?.navigationBar.prefersLargeTitles = true
         setupConstraintsForTableView()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        drinks = realmService.getObjects(CocktailRealm.self).filter { $0.isFavorite }
+        tableView.reloadData()
     }
     
     // MARK: - Adding UI elements and setting constraints
@@ -63,14 +69,12 @@ extension FavoriteViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let infoController = InfoViewController()
-        infoController.delegate = self
         
-        infoController.updateFavoriteStatus = { [weak self] _ in
-            self?.realmService.deleteUnfavoriteCocktailsFromStorage()
+        infoController.updateFavoriteStatus = { [weak self] in
             self?.tableView.reloadData()
         }
         
-        infoController.cocktail = drinks?[indexPath.row]
+        infoController.cocktail = drinks[indexPath.row]
         navigationController?.pushViewController(infoController, animated: true)
     }
 }
@@ -80,23 +84,27 @@ extension FavoriteViewController: UITableViewDelegate {
 extension FavoriteViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return drinks?.count ?? 0
+        return drinks.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: CellIdentifier.identifier, for: indexPath) as? FavoriteTableViewCell else { return UITableViewCell() }
         cell.delegate = self
-        cell.cocktail = drinks?[indexPath.row]
+        cell.cocktail = drinks[indexPath.row]
         cell.selectionStyle = .none
         return cell
     }
 }
 
 // MARK: - InfoViewControllerDelegate
-extension FavoriteViewController: InfoViewControllerDelegate {
+extension FavoriteViewController: CellDelegate {
     
-    func updateFavoriteStatus() {
-        tableView.reloadData()
+    func updateFavoriteStatus(cocktail: CocktailRealm) {
+        guard let index = drinks.firstIndex(of: cocktail) else { return }
+        drinks.remove(at: index)
+        tableView.beginUpdates()
+        tableView.deleteRows(at: [IndexPath(item: index, section: 0)], with: .right)
+        tableView.endUpdates()
     }
 }
 

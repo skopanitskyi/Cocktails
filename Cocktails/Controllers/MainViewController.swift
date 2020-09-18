@@ -15,8 +15,18 @@ class MainViewController: UIViewController {
     /// Padding for collection view cells
     private let padding: CGFloat = 16
     
+    /// Category cell height size
+    private let categoryCellHeight: CGFloat = 200
+    
+    /// Cocktail cell height size
+    private let cocktailCellHeight: CGFloat = 110
+    
+    /// Cocktail cell top inset
+    private let cocktailCellTopInset: CGFloat = 100
+    
     /// Identifiers for cells
     private let categoryIdentifier = "category"
+    
     private let cocktailIdentifier = "cocktail"
     
     /// Stores downloaded cocktails from the network
@@ -42,10 +52,19 @@ class MainViewController: UIViewController {
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
-        let collectionView = UICollectionView(frame: CGRect(), collectionViewLayout: layout)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsHorizontalScrollIndicator = false
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
+    }()
+    
+    /// Create search results label
+    private let searchResultsLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Search results:"
+        label.font = UIFont(name: "HelveticaNeue-Bold", size: 23)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
     }()
     
     // MARK: - Main view controller life cycle
@@ -53,11 +72,17 @@ class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .white
-        tabBarController?.delegate = self
         collectionView.register(CollectionViewCell.self, forCellWithReuseIdentifier: categoryIdentifier)
         collectionView.register(CocktailCollectionViewCell.self, forCellWithReuseIdentifier: cocktailIdentifier)
         setupNavigationBar()
         setupConstraintsForCollectionView()
+        setupSearchResultsLabel()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let cocktails = self.cocktails else { return }
+        updateDataIn(controller: self, cocktails: cocktails)
     }
     
     // MARK: - Adding UI elements and setting constraints
@@ -76,10 +101,19 @@ class MainViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.backgroundColor = .white
-        collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
-        collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
-        collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
+        collectionView.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
+        collectionView.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
+        collectionView.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
+        collectionView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+    }
+    
+    /// Add search results label and setup constraints
+    private func setupSearchResultsLabel() {
+        collectionView.addSubview(searchResultsLabel)
+        searchResultsLabel.topAnchor.constraint(equalTo: collectionView.topAnchor, constant: categoryCellHeight + cocktailCellTopInset / 2).isActive = true
+        searchResultsLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+        searchResultsLabel.leadingAnchor.constraint(equalTo: collectionView.leadingAnchor, constant: 15).isActive = true
+        searchResultsLabel.trailingAnchor.constraint(equalTo: collectionView.trailingAnchor, constant: -15).isActive = true
     }
     
     // MARK: - Update data
@@ -140,16 +174,16 @@ extension MainViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if indexPath.section == 1 {
-            return .init(width: view.bounds.width - 2 * padding, height: 110)
+            return .init(width: view.bounds.width - 2 * padding, height: cocktailCellHeight)
         }
-        return .init(width: view.bounds.width, height: 200)
+        return .init(width: view.bounds.width, height: categoryCellHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         if section == 1 {
-            return UIEdgeInsets(top: 0, left: padding, bottom: 0, right: padding)
+            return UIEdgeInsets(top: cocktailCellTopInset, left: padding, bottom: 0, right: padding)
         }
-        return UIEdgeInsets(top: 0, left: 0, bottom: padding, right: 0)
+        return UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
     }
 }
 
@@ -169,32 +203,7 @@ extension MainViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.endEditing(true)
-    }
-}
-
-// MARK: - TabBarControllerDelegate
-
-extension MainViewController: UITabBarControllerDelegate {
-    
-    func tabBarController(_ tabBarController: UITabBarController, didSelect viewController: UIViewController) {
-        
-        guard let navigationController = viewController as? UINavigationController else { return }
-        
-        if  navigationController.topViewController is MainViewController {
-            guard let cocktails = self.cocktails else { return }
-            updateDataIn(controller: self, cocktails: cocktails)
-        }
-        
-        if let favoriteController = navigationController.topViewController as? FavoriteViewController {
-            realmService.deleteUnfavoriteCocktailsFromStorage()
-            favoriteController.drinks = realmService.getObjects(CocktailRealm.self)
-            favoriteController.updateFavoriteStatus()
-        }
-        
-        if let cocktailsController = navigationController.topViewController as? CocktailsViewController {
-            guard let cocktails = cocktailsController.cocktails else { return }
-            updateDataIn(controller: cocktailsController, cocktails: cocktails)
-        }
+        searchController.isActive = false
     }
 }
 

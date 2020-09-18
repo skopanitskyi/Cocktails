@@ -135,7 +135,7 @@ class CocktailCollectionViewCell: UICollectionViewCell {
     @objc private func changeFavoriteStatus() {
         guard let drink = self.cocktail else { return }
         let isFavorite = !drink.isFavorite
-        realmService.updateCocktailData(cocktail: drink, isFavorite: isFavorite)
+        realmService.setData(cocktail: drink, isFavorite: isFavorite)
         setImageForFavoriteButton(isFavorite: drink.isFavorite)
     }
     

@@ -23,7 +23,7 @@ class InfoViewController: UIViewController {
     private let realmService = RealmService.shared
     
     /// Synchronizes favorite status between two different objects
-    public var updateFavoriteStatus: ((Bool) -> Void)?
+    public var updateFavoriteStatus: (() -> Void)?
     
     /// Cocktail object to be displayed
     public var cocktail: CocktailProtocol? {
@@ -96,8 +96,15 @@ class InfoViewController: UIViewController {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        guard let cocktail = self.cocktail else { return }
-        updateFavoriteStatus?(cocktail.isFavorite)
+        updateFavoriteStatus?()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if let cocktail = cocktail {
+            guard let isFavorite = realmService.getObjects(CocktailRealm.self).filter({$0.strDrink == cocktail.strDrink}).first else { return }
+            setImageForFavoriteButton(isFavorite: isFavorite.isFavorite)
+        }
     }
     
     // MARK: - Adding UI elements and setting constraints
@@ -189,10 +196,10 @@ class InfoViewController: UIViewController {
     @objc private func changeFavoriteStatus() {
         guard let drink = cocktail else { return }
         let isFavorite = !drink.isFavorite
-        realmService.updateCocktailData(cocktail: drink, isFavorite: isFavorite)
+        realmService.setData(cocktail: drink, isFavorite: isFavorite)
         setImageForFavoriteButton(isFavorite: isFavorite)
         delegate?.updateFavoriteStatus()
+        print(realmService.getObjects(CocktailRealm.self))
     }
 }
-
 

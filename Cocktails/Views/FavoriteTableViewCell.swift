@@ -8,18 +8,22 @@
 
 import UIKit
 
+protocol CellDelegate {
+    func updateFavoriteStatus(cocktail: CocktailRealm)
+}
+
 class FavoriteTableViewCell: UITableViewCell {
     
     // MARK: - Favorite table cell instances
     
     /// Delegate of info view controller
-    public var delegate: InfoViewControllerDelegate?
+    public var delegate: CellDelegate?
     
     /// Singleton object of class Realm Service
     private let realmService = RealmService.shared
     
     /// Cocktail object to be displayed
-    public var cocktail: CocktailProtocol? {
+    public var cocktail: CocktailRealm? {
         didSet {
             setData()
         }
@@ -146,8 +150,8 @@ class FavoriteTableViewCell: UITableViewCell {
     @objc private func changeFavoriteStatus() {
         guard let drink = self.cocktail else { return }
         let isFavorite = !drink.isFavorite
-        realmService.updateCocktailData(cocktail: drink, isFavorite: isFavorite)
+        realmService.update(by: drink.strDrink, isFavorite: isFavorite)
         setImageForFavoriteButton(isFavorite: isFavorite)
-        delegate?.updateFavoriteStatus()
+        delegate?.updateFavoriteStatus(cocktail: drink)
     }
 }

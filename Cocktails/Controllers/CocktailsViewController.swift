@@ -53,6 +53,11 @@ class CocktailsViewController: UIViewController {
         delegate?.synhronizeData()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        updateData()
+    }
+    
     // MARK: - Adding UI elements and setting constraints
     
     /// Adding table view and setup constraints
@@ -65,6 +70,18 @@ class CocktailsViewController: UIViewController {
         tableView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         tableView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor).isActive = true
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
+    }
+    
+    ///
+    ///
+    ///
+    ///
+    private func updateData() {
+        guard let cocktails = cocktails else { return }
+        realmService.deleteUnfavoriteCocktailsFromStorage()
+        realmService.synchronizeData(cocktails: cocktails)
+        tableView.reloadData()
+        print(realmService.getObjects(CocktailRealm.self))
     }
     
     // MARK: - Methods for working with the network
@@ -116,11 +133,9 @@ extension CocktailsViewController: UITableViewDelegate {
             infoController.cocktail = cocktail
             infoController.cocktail?.isFavorite = drink.isFavorite
         }
-        
-        infoController.updateFavoriteStatus = { [weak self] favorite in
-            self?.cocktails?[indexPath.row].isFavorite = favorite
-        }
-        
+//        infoController.updateFavoriteStatus = { [weak self] in
+////            self?.cocktails?[indexPath.row].isFavorite = favorite
+//        }
         navigationController?.pushViewController(infoController, animated: true)
     }
 }

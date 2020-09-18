@@ -127,7 +127,7 @@ class CocktailTableViewCell: UITableViewCell {
         drink.isFavorite = !drink.isFavorite
         NetworkManager(request: request).downloadCocktails { [weak self] cocktails in
             guard let cocktail = cocktails?.first else { return }
-            self?.realmService.updateCocktailData(cocktail: cocktail, isFavorite: drink.isFavorite)
+            self?.realmService.setData(cocktail: cocktail, isFavorite: drink.isFavorite)
         }
         setImageForFavoriteButton(isFavorite: drink.isFavorite)
     }
