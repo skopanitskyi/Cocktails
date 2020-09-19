@@ -192,14 +192,13 @@ class InfoViewController: UIViewController {
         favoriteButton.setImage(image, for: .normal)
     }
     
-    ///  Changes the favorite status when click on the button
+    /// Changes the favorite status when click on the button
     @objc private func changeFavoriteStatus() {
         guard let drink = cocktail else { return }
         let isFavorite = !drink.isFavorite
         realmService.setData(cocktail: drink, isFavorite: isFavorite)
         setImageForFavoriteButton(isFavorite: isFavorite)
         delegate?.updateFavoriteStatus()
-        print(realmService.getObjects(CocktailRealm.self))
     }
 }
 

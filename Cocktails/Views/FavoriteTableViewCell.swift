@@ -150,7 +150,7 @@ class FavoriteTableViewCell: UITableViewCell {
     @objc private func changeFavoriteStatus() {
         guard let drink = self.cocktail else { return }
         let isFavorite = !drink.isFavorite
-        realmService.update(by: drink.strDrink, isFavorite: isFavorite)
+        realmService.setData(cocktail: drink, isFavorite: isFavorite)
         setImageForFavoriteButton(isFavorite: isFavorite)
         delegate?.updateFavoriteStatus(cocktail: drink)
     }

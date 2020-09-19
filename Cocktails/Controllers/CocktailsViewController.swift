@@ -72,16 +72,11 @@ class CocktailsViewController: UIViewController {
         tableView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor).isActive = true
     }
     
-    ///
-    ///
-    ///
-    ///
+    /// Synchronizes the displayed data with the saved
     private func updateData() {
         guard let cocktails = cocktails else { return }
-        realmService.deleteUnfavoriteCocktailsFromStorage()
         realmService.synchronizeData(cocktails: cocktails)
         tableView.reloadData()
-        print(realmService.getObjects(CocktailRealm.self))
     }
     
     // MARK: - Methods for working with the network
@@ -133,9 +128,6 @@ extension CocktailsViewController: UITableViewDelegate {
             infoController.cocktail = cocktail
             infoController.cocktail?.isFavorite = drink.isFavorite
         }
-//        infoController.updateFavoriteStatus = { [weak self] in
-////            self?.cocktails?[indexPath.row].isFavorite = favorite
-//        }
         navigationController?.pushViewController(infoController, animated: true)
     }
 }

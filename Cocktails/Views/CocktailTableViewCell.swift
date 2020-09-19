@@ -123,8 +123,8 @@ class CocktailTableViewCell: UITableViewCell {
     @objc private func changeFavoriteStatus() {
         guard var drink = self.cocktail else { return }
         guard let request = CocktailRequest.searchByName(name: drink.strDrink).request else { return }
-        
         drink.isFavorite = !drink.isFavorite
+        
         NetworkManager(request: request).downloadCocktails { [weak self] cocktails in
             guard let cocktail = cocktails?.first else { return }
             self?.realmService.setData(cocktail: cocktail, isFavorite: drink.isFavorite)

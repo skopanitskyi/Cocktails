@@ -8,7 +8,7 @@
 
 import UIKit
 
-// Stores identifiers for cell and favorite images
+/// Stores identifiers for cell and favorite images
 struct CellIdentifier {
     public static let identifier = "Cell"
     public static let favorite = "favorite"

@@ -26,7 +26,7 @@ class RealmService {
     // MARK: - Realm service class constructor
     
     /// Private realm service class constructor
-    private init() { }
+    private init() { deleteUnfavoriteCocktailsFromStorage() }
     
     // MARK: - Realm service class methods
     
@@ -46,7 +46,7 @@ class RealmService {
     /// - Parameters:
     ///   - name: The name of the cocktail to be updated
     ///   - isFavorite: Is the cocktail is favorite
-    public func update(by name: String, isFavorite: Bool) {
+    private func update(by name: String, isFavorite: Bool) {
         guard let cocktail = getCocktail(by: name) else { return }
         
         do {
@@ -60,7 +60,7 @@ class RealmService {
     
     /// Deletes the specified object in the device’s memory.
     /// - Parameter object: The object to be removed from memory
-    public func delete<T: Object>(_ object: T) {
+    private func delete<T: Object>(_ object: T) {
         do {
             try realm.write {
                 realm.delete(object)
@@ -76,17 +76,29 @@ class RealmService {
         return Array(realm.objects(type))
     }
     
+    /// Updates objects stored in memory or adds new ones
+    /// - Parameters:
+    ///   - cocktail: Cocktail to be added or updated
+    ///   - isFavorite: Is the cocktail is favorite
     public func setData(cocktail: CocktailProtocol, isFavorite: Bool) {
         var cocktail = cocktail
         
-        if isStored(name: cocktail.strDrink) {
+        if cocktail is CocktailRealm {
             update(by: cocktail.strDrink, isFavorite: isFavorite)
+        } else if isStored(name: cocktail.strDrink) {
+            update(by: cocktail.strDrink, isFavorite: isFavorite)
+            cocktail.isFavorite = isFavorite
         } else {
+            cocktail.isFavorite = isFavorite
             guard let cocktail = createRealmCocktail(cocktail: cocktail, isFavorite: isFavorite) else { return }
             add(cocktail)
         }
     }
     
+    /// Creates a cocktail realm object that will be stored in memory
+    /// - Parameters:
+    ///   - cocktail: Cocktail object that contains data
+    ///   - isFavorite: Is the cocktail is favorite
     private func createRealmCocktail(cocktail: CocktailProtocol, isFavorite: Bool) -> CocktailRealm? {
         return CocktailRealm(strDrink: cocktail.strDrink,
                              strDrinkThumb: cocktail.strDrinkThumb,
@@ -94,6 +106,8 @@ class RealmService {
                              isFavorite: isFavorite)
     }
     
+    /// Check if the cocktail is stored in memory by the given name
+    /// - Parameter name: The name of the cocktail to be searched for in memory
     private func isStored(name: String) -> Bool {
         if let _ = getCocktail(by: name) {
             return true
@@ -101,6 +115,8 @@ class RealmService {
         return false
     }
     
+    /// Returns the cocktail object stored in memory
+    /// - Parameter name: Name of the cocktail to be returned
     private func getCocktail(by name: String) -> CocktailRealm? {
         return getObjects(type).filter({ $0.strDrink == name }).first
     }
@@ -121,7 +137,7 @@ class RealmService {
     ///   - savedCocktails: Saved cocktails in the device memory
     private func synchronizeFavoriteStatus(cocktail: Cocktail, savedCocktails: [CocktailRealm]) {
         for savedCocktail in savedCocktails {
-            if cocktail.strDrink == savedCocktail.strDrink {
+            if cocktail.strDrink == savedCocktail.strDrink && savedCocktail.isFavorite {
                 cocktail.isFavorite = true
                 return
             }
@@ -130,7 +146,7 @@ class RealmService {
     }
     
     /// Removes unfavorite cocktails from devices memory
-    public func deleteUnfavoriteCocktailsFromStorage() {
+    private func deleteUnfavoriteCocktailsFromStorage() {
         let savedCocktails = getObjects(type)
         for cocktail in savedCocktails {
             if !cocktail.isFavorite {

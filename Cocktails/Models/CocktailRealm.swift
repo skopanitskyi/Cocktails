@@ -16,7 +16,10 @@ class CocktailRealm: Object, CocktailProtocol {
     @objc dynamic var strInstructions: String? = ""
     @objc dynamic var isFavorite: Bool = true
     
-    convenience init?(strDrink: String, strDrinkThumb: String, strInstructions: String?, isFavorite: Bool) {
+    // MARK: - CocktailRealm class constructor
+    
+    /// CocktailRealm class constructor
+    convenience init(strDrink: String, strDrinkThumb: String, strInstructions: String?, isFavorite: Bool) {
         self.init()
         self.strDrink = strDrink
         self.strDrinkThumb = strDrinkThumb

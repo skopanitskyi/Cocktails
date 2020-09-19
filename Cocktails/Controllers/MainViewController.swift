@@ -82,7 +82,7 @@ class MainViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         guard let cocktails = self.cocktails else { return }
-        updateDataIn(controller: self, cocktails: cocktails)
+        updateData(cocktails: cocktails)
     }
     
     // MARK: - Adding UI elements and setting constraints
@@ -119,13 +119,10 @@ class MainViewController: UIViewController {
     // MARK: - Update data
     
     /// Refreshes the data for the latest
-    /// - Parameters:
-    ///   - controller: The controller in which the data will be updated
-    ///   - cocktails: Data to be updated
-    private func updateDataIn(controller: InfoViewControllerDelegate, cocktails: [Cocktail]) {
-        realmService.deleteUnfavoriteCocktailsFromStorage()
+    /// - Parameter cocktails: Data to be updated
+    private func updateData(cocktails: [Cocktail]) {
         realmService.synchronizeData(cocktails: cocktails)
-        controller.updateFavoriteStatus()
+        collectionView.reloadData()
     }
 }
 
